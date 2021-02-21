@@ -1,0 +1,177 @@
+li.meshorer
+daniel.brown1
+
+=============================
+=      File description     =
+=============================
+
+BinaryTree.java- this class is an abstract class that represents a binary tree, from which the AvlTree
+    class inherits. it has the next abstract methods: add, delete, contains, size.
+
+Node.java - this class is a class that represents a node in an AVL tree. An AVL tree is made out of
+    these nodes. It has the mainly getter and setter functions, and fields like parent, left and right sons,
+    and the balance factor.
+
+AvlTree.java- This class is the implementation of an AVL-tree. inherits from BinaryTree.
+
+Balancer.java- this class is a singleton class, and has a significant method- 'balanceManager'.
+    The only instance of Balancer is saved as a static field in the AvlTree class, and every time an addition
+    or deletion is made, the Balancer's 'balanceManager' method is called. The method manages everything
+    related to the balance of the tree.
+
+Rotator.java- this class is a singleton class, and has one significant method- 'rotateManager'. The only
+    instance of the Rotator is saved as a static field in the Balancer class, and every time
+    the Balancer method is called, the Rotator's 'rotateManager' method is called. the method manages
+    everything related to the rotation of the tree.
+
+README file
+
+=============================
+=          Design           =
+=============================
+
+A) BinaryTree class -
+In order to allow adding other kinds of trees to the project in the future, we created a BinaryTree class
+including main method (such as add, delete, iterator etc') that are abstract and will be implemented with the
+wanted functionality for each specific tree.
+
+
+B) Nodes -
+A Node class was created in order to built the tree and hold it's values.
+At first we thought to insert these nodes into a LinkedList representing a tree, but than decided to refer to
+the ROOT of the tree, as a reference for the whole tree.
+
+
+C) ROTATOR and BALANCER -
+We have chosen the balance process to be handled by 2 (!) classes each has it's own unique role:
+BALANCER - checks for violations and is fully responsible for the balance factor.
+        Calls the Rotator if needed.
+ROTATOR - Detects which kind of violation it is and balance the tree in accordance.
+
+
+D) Singeltons -
+Both ROTATOR and BALANCER are singeltons as we decided to limit the creation of these methods to only one
+instance each. We realized there is no point in creating a new BALANCER for each tree, as they all do the
+same job.
+
+
+E) ACCESS -
+We have chosen all the methods and field relevant to one class only to be private and the ones that relevant
+for other class in the package received a package modifier.
+
+=============================
+=  Implementation details   =
+=============================
+
+A) DELETE -
+Since deleting is different for each node based on the amount of kids it has, we have created a few
+sub-methods making the deleting phase more easy to handle :
+deleteLeaf ; deleteNodeOneChild ; deleteNodeTwoChildren.
+
+
+B) ADD -
+Our add method is running in an O(log n) time as it searches for the relevant parent in tree, to which we
+want to add the node as a child. After each addition the tree makes sure it is balanced and fixes it if needed
+
+
+C) GetSpotInTree -
+As we realized both DELETE and ADD do the same thing for reaching a node (if by adding - getting the right
+parent , or by deleting - finding the specific node).
+This method is 'traveling' through the tree and gets to the right spot -
+    >> if the givenNode is found (in case of delete) it returns it, so that we now have not only the relevant
+        node data but also children and parent.
+    >> if it isn't (in case of adding) - it returns the parent, and makes it easier to then, just connect it
+        to the parent node.
+
+
+D) Iterator -
+As done and advised a lot on the web, a common way to build an iterator to a tree was to create a linkedList
+and iterate over it. We have decided to use the tree functionality and use the SUCCESSOR method to get the
+next element.
+
+
+=============================
+=    Answers to questions   =
+=============================
+
+A) ANALYZING THE AVL TREE
+1. Find a series of 12 numbers, such that when they are inserted into an empty AVL tree one-by-one,
+the result will be a tree of height 4 (insertions only, no deletions).
+(Hint: We suggest you start by figuring out the order in which the nodes were inserted into the
+example tree, and then continue to create the larger one.)
+
+ >> In order to insert the series of 12 numbers to the AVL tree we will take the floor(midNumberInSeries)
+    and insert it first, than the middle number in the left subSeries (1-6 for example), and than the middle
+    number in the second subSeries (6-12 for example) and so on...
+ >> A possible series would be:  6   3   9   2   4   8   10    1   5   7   11  12
+
+
+B) THE COMPLEXITY OF CONSTRUCTING AVL TREE
+1. What is the asymptotic running time complexity of the tree construction done in AvlTree(int[] data)?
+
+  >> We chose to implement the tree construction done in AvlTree(int[] data) as taught in DAST lessons:
+     we run through the data array elements and add them one by one. Then we check for violations in each
+     iteration - and fix it if needed.
+  >> It's time complexity is : O (n log n)
+  >> n - as we go through all the elements in the given array
+     log n - as we balance the tree every time after adding a node - it might take O(log n) as the upper bound
+     of this action will be the height of the tree (AVL trees have a height of (log n) by demand).
+  >> Why is the upper bound the height of the tree? The worst case scenario is the one a violation would make
+     us the balance it all the way from the lowest node to the root. That would really take (log n)
+     and by making it for each node we add - we get an upper bound of O( n log n)
+
+2. Bonus: What is the best possible running time complexity for a specific case?
+
+  >> A specific case that can get the best running time for OUR algorithm is a case in which the array is
+     already sorted in such way that requires no balancing the tree >> for example the series we showed before
+  >> In this case we will add the element > check if there is a violation O(1) > no violation found and no
+     balancing needed > go on to the next element, etc'.
+  >> The running time in total in this case would be: O( n ) - for the amount of elements in array.
+
+  >> The best time complexity for adding to the tree, in general would be O( n ) and will take place
+     in case we have a sorted array and we are adding nodes to tree by the principle of "ADD THE MIDDLE FIRST"
+     That means we would start with the value in the middle of the sorted array A and than look at it as 2
+     sub-Arrays ( A1 - from index 0 to index - midA | A2 - from index midA+1 to A.size() )
+     Than we will take the mid index for each sub-array and continue until we've added all nodes in A.
+
+
+C) COMPLEXITY OF COPYING A TREE
+1. What is the asymptotic running time complexity of the tree construction done in AvlTree(AvlTree avlTree)?
+
+  >> The copying running time complexity is exactly as the constructing running time - O ( n log n )
+  >> The copying proccess includes iterating over the given tree nodes - O( n ) > creating new node with the
+    relevant value  O( 1 ) >  balance the violations if needed  O( log n )
+  >> The whole process - O ( n log n )
+
+2. What is the best possible running time complexity for a specific case? (this is not a bonus question!)
+
+  >> for a tree of the type:
+                     5
+                  /     \
+                 3        7
+               /  \      /  \
+             1     4    6     9
+
+    The copying running time in the best case will be O( n ) and that would also be relevant for a case in
+    which we copy the tree by a SORTED order.
+
+     >> The principle of "ADD THE MIDDLE" is relevant for copying too as it 'saves' the need to check for the
+        tree balance and rotate it while copying the given tree.
+        That means we would start with the value in the middle of the sorted array A and than look at it as 2
+        sub-Arrays ( A1 - from index 0 to index - midA | A2 - from index midA+1 to A.size() )
+        Than we will take the mid index for each sub-array and continue until we've copied all nodes in A.
+
+
+
+D) COMPLEXITY OF CALCULATING MINIMAL NUM OF NODES FOR  A TREE WITH GIVEN HEIGHT
+1. What is the asymptotic running time complexity of your implementation of the operation done in
+findMinNodes(int h)?
+
+  >> Our implementation is in running time of O( 1 ) as it is using the Fibonachi formula including
+    an arithmetic calculation that isn't dependent in a given input, but using the height only as a number.
+    This method allow us to get to the best running time possible - constant time.
+
+2. Is that the best possible asymptotic running time complexity? If not, what is the best achievable
+complexity?
+
+  >> O( 1 ) is the best running time possible for almost any kind of algorithm, as so for this method.
